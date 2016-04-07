@@ -58,6 +58,7 @@
     this.toggleSubmit()
 
     this.$element.on('input.bs.validator change.bs.validator focusout.bs.validator', Validator.INPUT_SELECTOR, $.proxy(this.onInput, this))
+    this.$element.on('showerros.bs.validator', Validator.INPUT_SELECTOR, $.proxy(this.onValidateImmediately, this))
     this.$element.on('submit.bs.validator', $.proxy(this.onSubmit, this))
 
     this.$element.find('[data-match]').each(function () {
@@ -132,9 +133,9 @@
     var self = this
 
     return this.runValidators($el).done(function (errors) {
-      $el.data('bs.validator.errors', errors)
+      $el.data('bs.validator.errors', errors);
 
-      errors.length
+      (errors && errors.length)
         ? deferErrors ? self.defer($el, self.showErrors) : self.showErrors($el)
         : self.clearErrors($el)
 
@@ -145,6 +146,47 @@
 
         self.$element.trigger(e)
       }
+
+      self.toggleSubmit()
+
+      self.$element.trigger($.Event('validated.bs.validator', {relatedTarget: $el[0]}))
+    })
+  }
+
+  Validator.prototype.onValidateImmediately = function (e) {
+    var self        = this
+    var $el         = $(e.target)
+    var deferErrors = false
+    this.validateInputImmediately($el, deferErrors).done(function () {
+      self.toggleSubmit()
+    })
+  }
+
+  Validator.prototype.validateInputImmediately = function ($el, deferErrors) {
+    var prevErrors = $el.data('bs.validator.errors')
+    var errors;
+    if ($el.is('[type="radio"]')) $el = this.$element.find('input[name="' + $el.attr('name') + '"]')
+
+    var e = $.Event('validate.bs.validator', {relatedTarget: $el[0]})
+    this.$element.trigger(e)
+    if (e.isDefaultPrevented()) return
+
+    var self = this
+
+    return this.runValidators($el).done(function (errors) {
+      $el.data('bs.validator.errors', errors)
+
+      if (errors && errors.length) {
+        self.showErrors($el);
+      } else {
+        self.clearErrors($el);
+      }
+
+      e = errors.length
+        ? $.Event('invalid.bs.validator', {relatedTarget: $el[0], detail: errors})
+        : $.Event('valid.bs.validator', {relatedTarget: $el[0], detail: prevErrors})
+
+      self.$element.trigger(e)
 
       self.toggleSubmit()
 
@@ -219,7 +261,7 @@
     var $block = $group.find('.help-block.with-errors')
     var $feedback = $group.find('.form-control-feedback')
 
-    if (!errors.length) return
+    if (!(errors && errors.length)) return
 
     errors = $('<ul/>')
       .addClass('list-unstyled')
