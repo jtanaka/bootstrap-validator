@@ -29,7 +29,7 @@ lead: "A simple and user-friendly form validator plugin for Bootstrap 3"
             <input type="text" pattern="^[_A-z0-9]{1,}$" maxlength="15" class="form-control" id="inputTwitter" placeholder="1000hz" required>
           </div>
           <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-          <span class="help-block with-errors">Hey look, this one has feedback icons!</span>
+          <div class="help-block with-errors">Hey look, this one has feedback icons!</div>
         </div>
         <div class="form-group">
           <label for="inputEmail" class="control-label">Email</label>
@@ -41,7 +41,7 @@ lead: "A simple and user-friendly form validator plugin for Bootstrap 3"
           <div class="form-inline row">
             <div class="form-group col-sm-6">
               <input type="password" data-toggle="validator" data-minlength="6" class="form-control" id="inputPassword" placeholder="Password" required>
-              <span class="help-block">Minimum of 6 characters</span>
+              <div class="help-block">Minimum of 6 characters</div>
             </div>
             <div class="form-group col-sm-6">
               <input type="password" class="form-control" id="inputPasswordConfirm" data-match="#inputPassword" data-match-error="Whoops, these don't match" placeholder="Confirm" required>
@@ -90,7 +90,7 @@ lead: "A simple and user-friendly form validator plugin for Bootstrap 3"
       <input type="text" pattern="^[_A-z0-9]{1,}$" maxlength="15" class="form-control" id="inputTwitter" placeholder="1000hz" required>
     </div>
     <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
-    <span class="help-block with-errors">Hey look, this one has feedback icons!</span>
+    <div class="help-block with-errors">Hey look, this one has feedback icons!</div>
   </div>
   <div class="form-group">
     <label for="inputEmail" class="control-label">Email</label>
@@ -101,7 +101,7 @@ lead: "A simple and user-friendly form validator plugin for Bootstrap 3"
     <label for="inputPassword" class="control-label">Password</label>
     <div class="form-group col-sm-6">
       <input type="password" data-minlength="6" class="form-control" id="inputPassword" placeholder="Password" required>
-      <span class="help-block">Minimum of 6 characters</span>
+      <div class="help-block">Minimum of 6 characters</div>
     </div>
     <div class="form-group col-sm-6">
       <input type="password" class="form-control" id="inputPasswordConfirm" data-match="#inputPassword" data-match-error="Whoops, these don't match" placeholder="Confirm" required>
@@ -224,6 +224,19 @@ $('#myForm').validator()
            <td>boolean</td>
            <td>true</td>
            <td>Disable the submit button until the form is valid and all required fields are complete.</td>
+         </tr>
+         <tr>
+           <td>focus</td>
+           <td>boolean</td>
+           <td>true</td>
+           <td>
+             <p>Scroll to and focus the first field with an error upon validation of the form.</p>
+             <p>If, for example, you have a fixed navbar at the top of your page and you need to adjust the amount of padding between the top of the window and the focused field, you can override the following variable:</p>
+{% highlight js %}
+$.fn.validator.Constructor.FOCUS_OFFSET
+{% endhighlight %}
+             <p>It defaults to 20 (px).</p>
+           </td>
          </tr>
          <tr>
            <td>feedback</td>

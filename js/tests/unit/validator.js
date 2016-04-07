@@ -220,6 +220,70 @@ $(function () {
       .validator('validate')
   })
 
+  QUnit.test('should add feedback classes to .form-control-feedback elements when the form group .has-feedback', function (assert) {
+    var done = assert.async()
+    var form = '<form>'
+      + '<div class="form-group has-feedback">'
+      +   '<input type="text" data-minlength="6" value="pizza">'
+      +   '<div class="form-control-feedback"></div>'
+      + '</div>'
+      + '</form>'
+
+    $(form)
+      .on('invalid.bs.validator', function (e) {
+        assert.ok($(this).find('.form-control-feedback').hasClass('glyphicon-remove'), 'error feedback class added to .form-control-feedback')
+        $(e.relatedTarget).val('pizzas').trigger('input')
+      })
+      .on('valid.bs.validator', function (e) {
+        assert.ok($(this).find('.form-control-feedback').hasClass('glyphicon-ok'), 'success feedback class added to .form-control-feedback')
+        done()
+      })
+      .validator('validate')
+  })
+
+  QUnit.test('should not add feedback classes to .form-control-feedback elements when the form group does not .has-feedback', function (assert) {
+    var done = assert.async()
+    var form = '<form>'
+      + '<div class="form-group">'
+      +   '<input type="text" data-minlength="6" value="pizza">'
+      +   '<div class="form-control-feedback"></div>'
+      + '</div>'
+      + '</form>'
+
+    $(form)
+      .on('invalid.bs.validator', function (e) {
+        assert.ok(!$(this).find('.form-control-feedback').hasClass('glyphicon-remove'), 'error feedback class not added to .form-control-feedback')
+        $(e.relatedTarget).val('pizzas').trigger('input')
+      })
+      .on('valid.bs.validator', function (e) {
+        assert.ok(!$(this).find('.form-control-feedback').hasClass('glyphicon-ok'), 'success feedback class not added to .form-control-feedback')
+        done()
+      })
+      .validator('validate')
+  })
+
+  QUnit.test('should not add success feedback classes to empty fields', function (assert) {
+    var done = assert.async()
+    var form = '<form>'
+      + '<div class="form-group has-feedback">'
+      +   '<input type="text" data-minlength="6" value="pizza">'
+      +   '<div class="form-control-feedback"></div>'
+      + '</div>'
+      + '</form>'
+
+    $(form)
+      .on('invalid.bs.validator', function (e) {
+        assert.ok($(this).find('.form-control-feedback').hasClass('glyphicon-remove'), 'error feedback class added to .form-control-feedback')
+        $(e.relatedTarget).val('').trigger('input')
+      })
+      .on('valid.bs.validator', function (e) {
+        assert.ok(!$(this).find('.form-control-feedback').hasClass('glyphicon-ok'), 'success feedback class not added to .form-control-feedback')
+        assert.ok(!$(this).find('.form-group').hasClass('has-success'), '.has-success not added to .form-group')
+        done()
+      })
+      .validator('validate')
+  })
+
   QUnit.test('should disable submit button unless form is complete and valid', function (assert) {
     var form = '<form>'
       + '<input id="required" type="text" required>'
@@ -426,8 +490,9 @@ $(function () {
 
   QUnit.test('should clean up after itself when destroy called', function (assert) {
     var form = '<form>'
-      + '<div class="form-group">'
+      + '<div class="form-group has-feedback">'
       +   '<input type="text" data-error="error message" required>'
+      +   '<div class="form-control-feedback"></div>'
       +   '<div class="help-block with-errors">original content</div>'
       + '</div>'
       + '<button type="submit">Submit</button>'
@@ -442,6 +507,7 @@ $(function () {
     assert.ok(!form.attr('novalidate'), 'removed novalidate browser override')
     assert.ok(Object.keys(form.find('input').data()).length === 1, 'removed data left on inputs (excluding data-* attrs)')
     assert.ok(!form.find('.has-error').length, 'removed has-error class from all inputs')
+    assert.ok(!form.find('.glyphicon-remove').length, 'removed feedback class from all inputs')
     assert.ok(form.find('.help-block').html() === 'original content', 'help block content restored')
     assert.ok(!form.find('button').is('.disabled'), 're-enabled submit button')
   })
