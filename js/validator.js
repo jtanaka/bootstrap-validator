@@ -174,10 +174,16 @@
   }
 
   Validator.prototype.showErrors = function ($el) {
+    // Guard
+    if ($el === undefined) { return; }  // MYC
     var method = this.options.html ? 'html' : 'text'
     var errors = $el.data('bs.validator.errors')
+    // Guard
+    errors = errors ? errors : [];  // MYC
     var $group = $el.closest('.form-group')
-    var $block = $group.find('.help-block.with-errors')
+    // var $block = $group.find('.help-block.with-errors')
+    // HACK: monkey patching $block to exclude elements which has form-group inside
+    var $block = $group.children(":not(:has('.form-group'))").filter('.help-block.with-errors');
     var $feedback = $group.find('.form-control-feedback')
 
     if (!errors.length) return
@@ -197,8 +203,12 @@
   }
 
   Validator.prototype.clearErrors = function ($el) {
+    // Guard
+    if ($el === undefined) { return; }  // MYC
     var $group = $el.closest('.form-group')
-    var $block = $group.find('.help-block.with-errors')
+    // var $block = $group.find('.help-block.with-errors')
+    // HACK: monkey patching $block to exclude elements which has form-group inside
+    var $block = $group.children(":not(:has('.form-group'))").filter('.help-block.with-errors');
     var $feedback = $group.find('.form-control-feedback')
 
     // check that no other input in same group has error
